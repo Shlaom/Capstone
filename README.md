@@ -14,6 +14,8 @@
 # 필요 기술 및 참고 문헌
 
 # 팀원 구성
-이승준 https://github.com/Shlaom![image](https://user-images.githubusercontent.com/96522336/173509011-3c612e10-e4ae-4d5c-9b8d-aeb0572cd05f.png) 
-김강섭 https://github.com/eneleh758 ![image](https://user-images.githubusercontent.com/96522336/173509029-6777c01b-3a4b-401a-8355-72afb046d175.png)
-윤예진 https://github.com/yejin603 ![image](https://user-images.githubusercontent.com/96522336/173509054-93f335b5-9850-4a3c-b42f-f43371a20238.png)
+이승준 https://github.com/Shlaom
+
+김강섭 https://github.com/eneleh758 
+
+윤예진 https://github.com/yejin603
