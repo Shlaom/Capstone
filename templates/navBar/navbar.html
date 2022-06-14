@@ -1,0 +1,71 @@
+<!-- 내비게이션 바 -->
+
+<style type="text/css">
+    #header a{text-decoration:none; color:black; transition :color .25s ease-in-out;}
+    #header a:hover{color:#ff0000;}
+    #header{background:white; height:55px; border-bottom:1px solid gray;}
+    .header_wrap{ width:100%; margin:0 auto;  position:absolute;}
+    #logo{float:left; margin:0; padding:15px 0 0 150px;}
+
+    nav ul{width:100%; list-style-type:none; padding:0; }
+    nav {margin-right:50px;}
+
+
+    .left {float:left; margin-left:20px; padding:0px 20px 0px 20px; }
+    .right {float:right;}
+
+
+    .submenu li {text-align:center; visibility:hidden; height:0px; transition:height 0.35s ease; margin-left: 16px;}
+    .gnb>li:hover .submenu li {background-color:white; visibility:visible; height:40px;}
+
+
+    .gnb>li a{ line-height:40px; }
+
+    #order a {color:#F6F6F6; background-color:#000054; border-radius: 8px; padding: 5px 15px 5px 15px;}
+
+</style>
+
+<div id="header">
+    <div class="header_wrap">
+        <span id="logo"><a href="{% url 'masking:main' %}">
+            <img src="/static/images/logo.png" width="140px" height="30px">
+        </a></span>
+        <nav id="nav">
+            <ul class="gnb">
+                <li class="left" id="drop">
+                    <a href="{% url 'masking:main' %}">menu1</a>
+                </li>
+
+                <li class="left" id="order">
+                    <!-- 방송 시청은 로그인 이후에 접속되도록-->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'masking:home' %}">방송시청</a>
+                    {% else %}
+                    <a href="{% url 'common:login_main' %}">방송시청</a>
+                    {% endif %}
+
+                </li>
+                <li class="left"><a href="{% url 'masking:main' %}">menu3</a></li>
+                <li class="left"><a href="{% url 'masking:main' %}">menu4</a></li>
+
+                <li class="left"><a href="{% url 'masking:main' %}">menu5</a></li>
+
+
+
+                <li class="right">
+                    <!-- 마이페이지는 로그인 이후에 접속되도록-->
+                    {% if user.is_authenticated %}
+                    {{ user.username }} 님
+                    <a href="{% url 'masking:mypage' %}">
+                        <img src="/static/images/myIcon.png" width="21px" height="19px"></a>
+                    <a href="{% url 'common:logout' %}" style="margin-left: 10px;">로그아웃</a>
+                    {% else %}
+                    <a href="{% url 'common:login_main' %}">
+                        <img src="/static/images/myIcon.png" width="21px" height="19px"></a>
+                    <a href="{% url 'common:login_main' %}" style="margin-left: 10px;">로그인</a>
+                    {% endif %}
+                </li>
+           </ul>
+        </nav>
+    </div>
+</div>
