@@ -5,7 +5,7 @@
 ## 시스템 시나리오
 ![image](https://user-images.githubusercontent.com/96522336/173508476-b597a2fe-6a52-4c09-9739-620ed3d14fcd.png)
 
-### 시스템 구성도
+## 시스템 구성도
 ![image](https://user-images.githubusercontent.com/96522336/173508593-4ef5c0ef-fa4f-4c82-8ab9-c8c38d829592.png)
 
 ## 전체 흐름도
