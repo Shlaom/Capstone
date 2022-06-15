@@ -104,7 +104,8 @@ class FaceDemo(object):
         #self.num_registered_faces = 0
         self.threshold = 0.8
 
-        self.video = cv2.VideoCapture('rtmp://192.168.207.119/live/demo')
+        # self.video = cv2.VideoCapture('rtmp://192.168.207.119/live/demo')
+        self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
