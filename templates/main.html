@@ -95,7 +95,7 @@
         <a style="margin-top: 5px;">{{ user.username }} 님</a>
         <button type="button" onclick="location.href='{% url 'common:logout' %}'" class="btn btn-secondary btn-sm" style="margin-right: 350px; margin-left: 10px; background: #FF0000;">Sign out</button>
       {% else %}
-        <button type="button" onclick="location.href='{% url 'common:login_main' %}'" class="btn btn-secondary btn-sm" style="margin-right: 350px; background: #FF0000;">Sign in</button>
+        <button type="button" onclick="location.href='{% url 'common:login_main' %}'" class="btn btn-secondary btn-sm" style="margin-right: 350px; background: #FF0000; width: 70px;">Sign in</button>
       {% endif %}
       </nav>
     </div>
