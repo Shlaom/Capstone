@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
-{% load static %}
+
 {% block content %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'css/signUp.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
-<script src="{% static 'js/showPasswd.js' %}"></script>
+    <form method="post" class="form-signin" action="{% url 'common:signUp' %}" style="margin: auto;">
+    {% csrf_token %}
+        <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
+        <label for="username" class="sr-only">User name</label>
+        <input type="text" name="username" id="username" class="form-control" placeholder="User name" style="width:300px;" required autofocus>
+        <label for="userid" class="sr-only">User ID</label>
+        <input type="text" id="userid" name="userid" class="form-control" placeholder="User ID" style="width:300px;" required>
+        <label for="input-showed" class="sr-only">Password</label>
+        <input type="password" id="input-showed" name="password1" class="form-control" placeholder="Password" style="width:300px;" required>
+        <label for="input-showed2" class="sr-only">Confirm Password</label>
+        <input type="password" id="input-showed2" name="password2" class="form-control" placeholder="Confirm Password" style="width:300px;" required>
 
-<div id="div-title-container" style="text-align:center">
-    <h1 id="h1-title"> 회원가입 </h1>
-</div>
-
-<div id="div-logo-container">
-    <div id="div-logo"></div>
-</div>
-
-<!-- 가입 창 -->
-{% include 'login/signUp_window.html' %}
+        <button class="btn btn-lg btn-primary btn-block" type="submit"
+              value="signup" id="btn-signup" name="signup-submit" style="margin-top: 15px;" >Sign up</button>
+    </form>
 
 {% endblock %}
