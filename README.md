@@ -15,6 +15,9 @@
 ![image](https://user-images.githubusercontent.com/96522336/173508646-2c9cc985-f459-44ff-acd8-5864fb19f061.png)
 
 ## 필요 기술 및 참고 문헌
+facenet
+*가나다
+*가나
 
 ## 팀원 구성
 이승준 https://github.com/Shlaom
