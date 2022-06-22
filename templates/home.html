@@ -5,7 +5,7 @@
 
 
 <body align="center">
-    <h2>######Video######</h2>
+    <h2>Video</h2>
 
     <div align="center">
         <table style="align: center; margin-bottom: 5px;">
@@ -18,13 +18,13 @@
 
         </table>
         <div class="btn-group btn-group-lg" role="group" aria-label="Basic outlined example">
-          <button type="button" class="btn btn-outline-primary">Mosaic</button>
-          <button type="button" class="btn btn-outline-primary">Blur</button>
-          <button type="button" class="btn btn-outline-primary">Image</button>
+          <button type="button" onclick = "location.href='{% url 'masking:mode_mosaic' %}'" class="btn btn-outline-light">Mosaic</button>
+          <button type="button" onclick = "location.href='{% url 'masking:mode_blur' %}'" class="btn btn-outline-light">Blur</button>
+          <button type="button" onclick = "location.href='{% url 'masking:mode_imaging' %}'" class="btn btn-outline-light">Image</button>
         </div>
         {% if user.is_admin %}
-        <a href="{% url 'masking:sample1' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue" style="margin-left: 150px;">On</a>
-        <a href="{% url 'masking:sample2' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black" style="margin-right: -300px;">Off</a>
+        <a href="{% url 'masking:masking_on' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue" style="margin-left: 150px;">On</a>
+        <a href="{% url 'masking:masking_off' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black" style="margin-right: -300px;">Off</a>
         {% endif %}
 
     </div>
