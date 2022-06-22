@@ -3,17 +3,30 @@
 {% block content %}
 
 
+
 <body align="center">
-    <h1>######Video######</h1>
+    <h2>######Video######</h2>
 
     <div align="center">
-        <table>
+        <table style="align: center; margin-bottom: 5px;">
             <tr>
                 <td>
                     <img src="{% url 'masking:video' %}" height = "500px" width = "800px">
+<!--                        <img src="https://cdn-icons-png.flaticon.com/128/3914/3914403.png" height = "500px" width = "800px">-->
                 </td>
             </tr>
+
         </table>
+        <div class="btn-group btn-group-lg" role="group" aria-label="Basic outlined example">
+          <button type="button" class="btn btn-outline-primary">Mosaic</button>
+          <button type="button" class="btn btn-outline-primary">Blur</button>
+          <button type="button" class="btn btn-outline-primary">Image</button>
+        </div>
+        {% if user.is_admin %}
+        <a href="{% url 'masking:sample1' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue" style="margin-left: 150px;">On</a>
+        <a href="{% url 'masking:sample2' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black" style="margin-right: -300px;">Off</a>
+        {% endif %}
+
     </div>
 </body>
 
