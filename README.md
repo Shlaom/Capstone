@@ -19,7 +19,7 @@ FaceNet
 
 OpenCV
 
-RTP(Real Time Transport Protocol)
+RTMP
 
 기타 인공지능, 네트워크, 코틀린, Django, DB서적
 
