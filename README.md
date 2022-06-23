@@ -17,7 +17,7 @@
 ## 필요 기술 및 참고 문헌
 FaceNet
 + A Unified Embedding for Face Recognition and Clustering
-+ 'https://github.com/davidsandberg/facenet'
++ https://github.com/davidsandberg/facenet
 + https://arxiv.org/abs/1503.03832
 
 OpenCV
