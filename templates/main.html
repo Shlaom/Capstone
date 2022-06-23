@@ -9,7 +9,7 @@
     {% if user.is_authenticated %}
       <a href="{% url 'masking:home' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue">방송 시청</a>
       {% if user.is_admin %}
-        <a href="#" class="btn btn-lg btn-secondary fw-bold border-white bg-black">얼굴 등록</a>
+        <a href="{% url 'masking:registration' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black">얼굴 등록</a>
       {% endif %}
     {% else %}
       <a href="{% url 'common:login_main' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue">방송 시청</a>
