@@ -23,7 +23,7 @@ FaceNet
 OpenCV
 + https://opencv.org
 
-RTMP(Real Time Message Protocol)
+RTMP(Real Time Messaging Protocol)
 
 기타 인공지능, 네트워크, 코틀린, Django, DB서적
 
