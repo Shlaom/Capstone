@@ -17,10 +17,13 @@
 ## 필요 기술 및 참고 문헌
 FaceNet
 + A Unified Embedding for Face Recognition and Clustering
++ https://github.com/davidsandberg/facenet
++ https://arxiv.org/abs/1503.03832
 
 OpenCV
++ https://opencv.org
 
-RTMP
+RTMP(Real Time Message Protocol)
 
 기타 인공지능, 네트워크, 코틀린, Django, DB서적
 
