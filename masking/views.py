@@ -41,7 +41,7 @@ class FrameProcessor(object):
         self.threshold = 0.8
         self.imgs = []
 
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
