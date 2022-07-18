@@ -4,7 +4,7 @@
 
 
 <body align="center">
-    <h1>######Video######</h1>
+    <h1>Video</h1>
 
     <div align="center">
         <table>
@@ -14,6 +14,15 @@
                 </td>
             </tr>
         </table>
+        <div class="btn-group btn-group-lg" role="group" aria-label="Basic outlined example">
+          <button type="button" onclick="location.href='{% url 'masking:mode_mosaic' %}'" class="btn btn-outline-light">Mosaic</button>
+          <button type="button" onclick="location.href='{% url 'masking:mode_blur' %}'" class="btn btn-outline-light">Blur</button>
+          <button type="button" onclick="location.href='{% url 'masking:mode_imaging' %}'" class="btn btn-outline-light">Image</button>
+        </div>
+        {% if user.is_admin %}
+        <a href="{% url 'masking:masking_on' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue" style="margin-left: 150px;">On</a>
+        <a href="{% url 'masking:masking_off' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black" style="margin-right: -300px;">Off</a>
+        {% endif %}
     </div>
 </body>
 
