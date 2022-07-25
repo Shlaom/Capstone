@@ -357,12 +357,16 @@ def mypage(request):
 def masking_on(request):
     global mode
     mode = 1
-    return render(request, 'home.html')
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
 
 def masking_off(request):
     global mode
     mode = 0
-    return render(request, 'home.html')
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
 
 def mode_mosaic(request):
     global sign

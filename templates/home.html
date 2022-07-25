@@ -3,6 +3,22 @@
 {% block content %}
 
     <script>
+        function masking_on(){
+            $.ajax({
+                url : "{% url 'masking:masking_on' %}",
+                type : 'GET',
+                dataType: 'json',
+                data : { 'param' : 1}
+            });
+        };
+        function masking_off(){
+            $.ajax({
+                url : "{% url 'masking:masking_off' %}",
+                type : 'GET',
+                dataType: 'json',
+                data : { 'param' : 0}
+            });
+        };
         function mosaic(){
             $.ajax({
                 url : "{% url 'masking:mode_mosaic' %}",
@@ -51,8 +67,8 @@
           <button type="button" onclick = "imaging()" class="btn btn-outline-light">Image</button>
         </div>
         {% if user.is_admin %}
-        <a href="{% url 'masking:masking_on' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-blue" style="margin-left: 150px;">On</a>
-        <a href="{% url 'masking:masking_off' %}" class="btn btn-lg btn-secondary fw-bold border-white bg-black" style="margin-right: -300px;">Off</a>
+        <a class="btn btn-lg btn-secondary fw-bold border-white bg-blue" onclick = "masking_on()" style="margin-left: 150px;">On</a>
+        <a class="btn btn-lg btn-secondary fw-bold border-white bg-black" onclick = "masking_off()" style="margin-right: -300px;">Off</a>
         {% endif %}
 
     </div>
