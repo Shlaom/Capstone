@@ -1,6 +1,9 @@
+import json
+
 from django.shortcuts import render
+
 from django.views.decorators import gzip
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse, JsonResponse
 import threading
 
 
@@ -32,13 +35,16 @@ class FrameProcessor(object):
         self.le = None
         self.mean_embs = []
         self.mosaic_margin = 30
-        self.masking_img = cv2.imread('./imgs/img2.png', cv2.IMREAD_UNCHANGED)
+        #self.masking_img2 = cv2.imread('./imgs/img3.png', cv2.IMREAD_UNCHANGED)
+        #self.masking_img = self.masking_img2[:,:,0:3]
+        self.masking_img = cv2.imread('./imgs/img.png', cv2.IMREAD_UNCHANGED)
         self.W = None
         self.H = None
         self.threshold = 0.8
         self.imgs = []
 
         self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
+        # self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
@@ -172,7 +178,6 @@ class FrameProcessor(object):
     def _do_blur(self, frame, unknown_imgs_locs):
         for loc in unknown_imgs_locs:
             (left, top, right, bottom) = self._apply_margin_to_locs(loc)
-            #(left, top, right, bottom) = i
 
             face_img = frame[top:bottom, left:right]  # 탐지된 얼굴 이미지 crop
             blurred_img = cv2.blur(face_img, (45, 45), anchor=(-1, -1), borderType=cv2.BORDER_DEFAULT)
@@ -180,25 +185,14 @@ class FrameProcessor(object):
         return frame
 
     def _do_imaging(self, frame, unknown_imgs_locs):
-        """for loc in unknown_imgs_locs:
+        for loc in unknown_imgs_locs:
             (left, top, right, bottom) = self._apply_margin_to_locs(loc)
 
             masking_img = cv2.resize(self.masking_img, dsize = (right-left, bottom-top), interpolation = cv2.INTER_LINEAR)
             #mask = np.full_like(masking_img, 255)
             #mixed = cv2.seamlessClone(masking_img, frame[margin_top:margin_bottom, margin_left:margin_right], mask, ((margin_right-margin_left)//2, (margin_bottom-margin_top)//2), cv2.MIXED_CLONE)
             #frame[margin_top:margin_bottom, margin_left:margin_right] = mixed
-            frame[top:bottom, left:right] = masking_img"""
-        for loc in unknown_imgs_locs:
-            (left, top, right, bottom) = self._apply_margin_to_locs(loc)
-
-            masking_img = cv2.resize(self.masking_img, dsize=(right - left, bottom - top),
-                                      interpolation=cv2.INTER_LINEAR)
-            masking_mask = masking_img[:, :, 3]
-            masking_logo = masking_img[:, :, :-1]
-
-            crop = frame[top:bottom, left:right]
-            cv2.copyTo(masking_logo, masking_mask, crop)
-
+            frame[top:bottom, left:right] = masking_img
         return frame
 
     def _apply_masking(self, frame, unknown_imgs_locs, sign):
@@ -256,44 +250,32 @@ class FrameProcessor(object):
         return unknown_faces_locs
 
     def _optimized_recognize_faces(self, frame, detected_faces_locs):
-        #cpy_mean_embs = copy.deepcopy(self.mean_embs)
+        cpy_mean_embs = copy.deepcopy(self.mean_embs)
 
         for locs in detected_faces_locs:
             (left, top, right, bottom) = locs
 
             img = resize(frame[top:bottom, left:right, :], (160, 160), mode='reflect')  # 학습용 이미지로 전처리
-            embs = self.calc_embs(img[np.newaxis], self.batch_size)
+            embs = self.calc_embs(img[np.newaxis], 1)
 
-            '''for mean_embs in cpy_mean_embs: #등록된 얼굴 수만큼 반복
+            for mean_embs in cpy_mean_embs: #등록된 얼굴 수만큼 반복
                 #print(mean_embs)
                 dst = self._findEuclideanDistance(mean_embs, embs)
                 if dst <= self.threshold:    #동일인물이면 해당 얼굴을 검출된 얼굴 배열에서 제거, 등록된 얼굴도 배열에서 제거
                     detected_faces_locs.remove(locs)
-                    if np.shape(self.mean_embs)[1] == 1:
-                        break
                     cpy_mean_embs.remove(mean_embs)
-                if len(cpy_mean_embs) == 0:
-                    break'''
-
-            for embs_ in self.mean_embs:
-                dst = self._findEuclideanDistance(embs_, embs)
-                if dst <= self.threshold:
-                    detected_faces_locs.remove(locs)
-                    break
-
-            """for i in range(0, np.shape(self.mean_embs)[0]):
-                dst = self._findEuclideanDistance(self.mean_embs[i], embs)
-                if dst <= self.threshold:
-                    detected_faces_locs.remove(locs)"""
+            if len(cpy_mean_embs) == 0:
+                break
         return detected_faces_locs
 
     def get_frame(self):
         frame = self.frame      #self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
         (self.H, self.W) = frame.shape[:2]
 
+        detected_faces_locs = self._detect_faces(frame)
+        unknown_faces_locs = self._optimized_recognize_faces(frame, detected_faces_locs)
+
         if mode == 1:
-            detected_faces_locs = self._detect_faces(frame)
-            unknown_faces_locs = self._optimized_recognize_faces(frame, detected_faces_locs)
             frame = self._apply_masking(frame, unknown_faces_locs, sign)
 
         frame_flip = cv2.flip(frame, 1)  # 좌우반전 flip
@@ -331,7 +313,6 @@ def video(request):
         # 응답 본문이 데이터를 계속 추가할 것이라고 브라우저에 알리고 브라우저에 원래 데이터를 데이터의 새 부분으로 교체하도록 요청
         # 즉, 서버에서 얻은 비디오가 jpeg 사진으로 변환되어 브라우저에 전달, 브라우저는 비디오 효과를 위해 이전 이미지를 새 이미지로 지속적 교체
         #frame_proc = FrameProcessor()
-        global frame_proc
         return StreamingHttpResponse(gen(frame_proc), content_type="multipart/x-mixed-replace;boundary=frame")
     except:
         pass
@@ -348,7 +329,6 @@ def registration(request):
 def face_capture(request):
     try:
         #frame_proc_for_reg = FrameProcessor()
-        global frame_proc
         return StreamingHttpResponse(gen_for_registration(frame_proc), content_type="multipart/x-mixed-replace;boundary=frame")
     except:
         pass
@@ -377,28 +357,40 @@ def mypage(request):
 def masking_on(request):
     global mode
     mode = 1
-    return render(request, 'home.html')
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
 
 def masking_off(request):
     global mode
     mode = 0
-    return render(request, 'home.html')
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
 
 def mode_mosaic(request):
     global sign
     sign = 1
-    return render(request, 'home.html')
-
-def mode_blur(request):
-    global sign
-    sign = 2
-    return render(request, 'home.html')
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
 
 def mode_imaging(request):
     global sign
     sign = 3
-    return render(request, 'home.html')
+
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
+
+def mode_test(request):
+    global sign
+    sign = 2
+    s = request.GET.get('param')
+    print(s)
+    return HttpResponse(None, content_type='application/json')
+    # return HttpResponse(json.dumps(c), content_type="application/json")
 
 mode = 1
-sign = 1
+sign = 3
 frame_proc = FrameProcessor()
