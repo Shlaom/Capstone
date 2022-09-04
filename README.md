@@ -8,6 +8,9 @@
 ## 시스템 시나리오
 ![image](https://user-images.githubusercontent.com/96522336/173508476-b597a2fe-6a52-4c09-9739-620ed3d14fcd.png)
 
+![image](https://user-images.githubusercontent.com/96522336/188310842-f603865c-ee68-4dd6-937b-6e3516c51ab9.png)
+
+
 ## 시스템 구성도
 ![image](https://user-images.githubusercontent.com/96522336/173508593-4ef5c0ef-fa4f-4c82-8ab9-c8c38d829592.png)
 
