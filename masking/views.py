@@ -1,6 +1,7 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from django.views.decorators import gzip
 from django.http import StreamingHttpResponse, HttpResponse, JsonResponse
@@ -37,7 +38,7 @@ class FrameProcessor(object):
         self.mosaic_margin = 30
         #self.masking_img2 = cv2.imread('./imgs/img3.png', cv2.IMREAD_UNCHANGED)
         #self.masking_img = self.masking_img2[:,:,0:3]
-        self.masking_img = cv2.imread('./imgs/img.png', cv2.IMREAD_UNCHANGED)
+        self.masking_img = cv2.imread('./imgs/img2.png', cv2.IMREAD_UNCHANGED)
         self.W = None
         self.H = None
         self.threshold = 0.8
@@ -142,7 +143,7 @@ class FrameProcessor(object):
 
         self.le = le
         #self.clf = clf
-        print("Completed!\n")
+        print("Training Complete!\n")
 
     def _findEuclideanDistance(self, src, dst):
         if type(src) == list:
@@ -189,10 +190,12 @@ class FrameProcessor(object):
             (left, top, right, bottom) = self._apply_margin_to_locs(loc)
 
             masking_img = cv2.resize(self.masking_img, dsize = (right-left, bottom-top), interpolation = cv2.INTER_LINEAR)
-            #mask = np.full_like(masking_img, 255)
-            #mixed = cv2.seamlessClone(masking_img, frame[margin_top:margin_bottom, margin_left:margin_right], mask, ((margin_right-margin_left)//2, (margin_bottom-margin_top)//2), cv2.MIXED_CLONE)
-            #frame[margin_top:margin_bottom, margin_left:margin_right] = mixed
-            frame[top:bottom, left:right] = masking_img
+            masking_mask = masking_img[:, :, 3]
+            masking_logo = masking_img[:, :, :-1]
+
+            crop = frame[top:bottom, left:right]
+            cv2.copyTo(masking_logo, masking_mask, crop)
+            # frame[top:bottom, left:right] = masking_img  # 스마일 마스크 사각형으로 쓰던 것
         return frame
 
     def _apply_masking(self, frame, unknown_imgs_locs, sign):
