@@ -40,7 +40,10 @@ class FrameProcessor(object):
         self.grabbed, self.frame = None, None
         #self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
         self.video = cv2.VideoCapture(0)
-        threading.Thread(target=self.update, args=()).start()
+        #threading.Thread(target=self.update, args=()).start()
+
+        self.processed_frame = None
+        threading.Thread(target=self.get_frame_loop, args=()).start()
 
     def __del__(self):
         self.video.release()
@@ -265,7 +268,7 @@ class FrameProcessor(object):
         return detected_faces_locs
 
     def get_frame(self):
-        frame = self.frame      #self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
+        frame = self.frame  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
         (self.H, self.W) = frame.shape[:2]
 
         detected_faces_locs = self._detect_faces(frame)
@@ -279,8 +282,27 @@ class FrameProcessor(object):
 
         return jpeg.tobytes()
 
+    def get_frame_loop(self):
+        while True:
+            _, self.frame = self.video.read()
+
+            frame = self.frame.copy()  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
+            (self.H, self.W) = frame.shape[:2]
+
+            detected_faces_locs = self._detect_faces(frame)
+            unknown_faces_locs = self._optimized_recognize_faces(frame, detected_faces_locs)
+
+            if self.mode == 1:
+                frame = self._apply_masking(frame, unknown_faces_locs, self.sign)
+
+            frame_flip = cv2.flip(frame, 1)  # 좌우반전 flip
+            _, jpeg = cv2.imencode('.jpg', frame_flip)  # jpeg:인코딩 된 이미지
+
+            self.processed_frame = jpeg.tobytes()
+
     def get_frame_for_registration(self):
-        frame = self.frame
+        #_, frame = self.video.read()
+        frame = self.frame.copy()
         (self.H, self.W) = frame.shape[:2]
 
         detected_faces_locs = self._detect_faces(frame)
