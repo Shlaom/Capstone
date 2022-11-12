@@ -6,13 +6,13 @@
 얼굴검출과 얼굴인식 딥러닝 모델을 이용하여 실시간 영상 프레임에서 얼굴을 검출하고 사전 등록된 얼굴과 비교해 분류해내어 마스킹 처리를 실시하는 알고리즘과 스마트폰에서 촬영하는 영상을 서버로 전송하고 처리된 영상을 웹 페이지에서 실시간으로 시청할 수 있는 프로젝트를 개발한다. 이로써 실시간 영상에 자동으로 마스킹 처리가 적용되어 실시간 스트리밍 중 초상권 침해 등의 문제를 자동으로 해결할 수 있는 시스템 구축을 목표로 한다.
 
 ## 시스템 시나리오
-![image](https://user-images.githubusercontent.com/96522336/173508476-b597a2fe-6a52-4c09-9739-620ed3d14fcd.png)
+![image](https://user-images.githubusercontent.com/96522336/201468220-e6d67ab7-f98e-4331-9b29-f18ec16de34d.png)
 
 ## 시스템 구성도
-![image](https://user-images.githubusercontent.com/96522336/173508593-4ef5c0ef-fa4f-4c82-8ab9-c8c38d829592.png)
+![image](https://user-images.githubusercontent.com/96522336/201468223-4bcf201d-bf16-4d11-803a-a7095ccf41be.png)
 
 ## 전체 흐름도
-![image](https://user-images.githubusercontent.com/96522336/173508646-2c9cc985-f459-44ff-acd8-5864fb19f061.png)
+![image](https://user-images.githubusercontent.com/96522336/201468231-42ff76ae-da99-4418-b985-a603dfc7549a.png)
 
 ## 필요 기술 및 참고 문헌
 FaceNet
