@@ -30,8 +30,6 @@ class FrameProcessor(object):
         self.le = None
         self.mean_embs = []
         self.mosaic_margin = 30
-        #self.masking_img2 = cv2.imread('./imgs/img3.png', cv2.IMREAD_UNCHANGED)
-        #self.masking_img = self.masking_img2[:,:,0:3]
         self.masking_img = cv2.imread('./imgs/img2.png', cv2.IMREAD_UNCHANGED)
         self.W, self.H = None, None
         self.threshold = 0.8
@@ -40,20 +38,12 @@ class FrameProcessor(object):
         self.mode = 1
         self.sign = 1
 
-        #self.grabbed, self.frame = None, None
         self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
-#        self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
-        #self.processed_frame = None
-        #threading.Thread(target=self.get_frame_loop, args=()).start()
-
     def __del__(self):
         self.video.release()
-
-    def _signal_handler(self, signal, frame):
-        self.is_interrupted = True
 
     def prewhiten(self, x):
         if x.ndim == 4:
@@ -86,7 +76,6 @@ class FrameProcessor(object):
 
     def capture_images(self, frame, name='Unknown'):
         detected_faces_locs = self._detect_faces(self.reg_net, frame)
-        #print(detected_faces_locs)
 
         if detected_faces_locs == []:
             print('Faces were not detected in frame..')
@@ -102,7 +91,7 @@ class FrameProcessor(object):
 
         (left, top, right, bottom) = largest_face[1:5]  # 가장 큰 얼굴의 좌표 저장
 
-        img = frame[top:bottom, left:right, :]  # cannot warp image with dimensions (0,0,3)식으로 어쩌고 하는 에러 해결
+        img = frame[top:bottom, left:right, :]
         if img.shape == (0, 0, 3):
             return frame
 
@@ -124,13 +113,10 @@ class FrameProcessor(object):
             labels.extend([name] * len(embs_))
             embs.append(embs_)
 
-        #embs = np.concatenate(embs)
         print("Completed!\n")
         print("Training...")
         le = LabelEncoder().fit(labels)
         y = le.transform(labels)
-        print(y)
-        ##################################################
         mean_embs = []
         for i in range(0, np.shape(embs)[0]):
             sum = [0] * 128
@@ -138,14 +124,11 @@ class FrameProcessor(object):
                 sum += j
             mean_embs.append(sum/np.shape(embs)[1])
         self.mean_embs.append(mean_embs)
-        ##################################################
-        #clf = SVC(kernel='linear', probability=True).fit(embs, y)
 
         self.le = le
-        #self.clf = clf
         print("Completed!\n")
 
-    def _findEuclideanDistance(self, src, dst):
+    def _find_euclidean_distance(self, src, dst):
         if type(src) == list:
             src = np.array(src)
 
@@ -220,11 +203,11 @@ class FrameProcessor(object):
             # 얼굴 인식 확률이 최소 확률보다 큰 경우
             if confidence > self.minimum_confidence:
                 # bounding box 위치 계산
-                box = detections[0, 0, i, 3:7] * np.array([self.W, self.H, self.W, self.H])  # w,h안곱하면 소수로 나옴
+                box = detections[0, 0, i, 3:7] * np.array([self.W, self.H, self.W, self.H])
                 (left, top, right, bottom) = box.astype("int")
 
-                (left, top) = (max(0, left), max(0, top))  # 왼쪽 위가 맞음
-                (right, bottom) = (min(self.W - 1, right), min(self.H - 1, bottom))  # 오른쪽 아래가 맞음
+                (left, top) = (max(0, left), max(0, top))
+                (right, bottom) = (min(self.W - 1, right), min(self.H - 1, bottom))
 
                 if (right - left < self.minimum_pixel_size) | (bottom - top < self.minimum_pixel_size):
                     continue
@@ -242,10 +225,8 @@ class FrameProcessor(object):
             embs = self.calc_embs(self.model, img[np.newaxis], 1)
 
             threshold = 0.6
-            # pred = "Unknown"
             for i in range(0, np.shape(self.mean_embs)[0]):
-                # dst = DeepFace.dst.findEuclideanDistance(self.mean_embs[i], embs)
-                dst = self._findEuclideanDistance(self.mean_embs[i], embs)
+                dst = self._find_euclidean_distance(self.mean_embs[i], embs)
                 if dst <= threshold:
                     break
                 if (i == (np.shape(self.mean_embs)[0] - 1)):
@@ -262,8 +243,7 @@ class FrameProcessor(object):
             embs = self.calc_embs(self.model, img[np.newaxis], 1)
 
             for mean_embs in cpy_mean_embs: #등록된 얼굴 수만큼 반복
-                #print(mean_embs)
-                dst = self._findEuclideanDistance(mean_embs, embs)
+                dst = self._find_euclidean_distance(mean_embs, embs)
                 if dst <= self.threshold:    #동일인물이면 해당 얼굴을 검출된 얼굴 배열에서 제거, 등록된 얼굴도 배열에서 제거
                     detected_faces_locs.remove(locs)
                     cpy_mean_embs.remove(mean_embs)
@@ -272,7 +252,7 @@ class FrameProcessor(object):
         return detected_faces_locs
 
     def get_frame(self):
-        frame = self.frame  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
+        frame = self.frame
         (self.H, self.W) = frame.shape[:2]
 
         detected_faces_locs = self._detect_faces(self.net, frame)
@@ -281,7 +261,7 @@ class FrameProcessor(object):
         if self.mode == 1:
             frame = self._apply_masking(frame, unknown_faces_locs, self.sign)
 
-        frame_flip = cv2.flip(frame, 1)  # 좌우반전 flip
+        frame_flip = cv2.flip(frame, 1)
         _, jpeg = cv2.imencode('.jpg', frame_flip)  # jpeg:인코딩 된 이미지
 
         return jpeg.tobytes()
@@ -290,7 +270,7 @@ class FrameProcessor(object):
         while True:
             _, self.frame = self.video.read()
 
-            frame = self.frame.copy()  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
+            frame = self.frame.copy()
             (self.H, self.W) = frame.shape[:2]
 
             detected_faces_locs = self._detect_faces(self.net, frame)
@@ -299,7 +279,7 @@ class FrameProcessor(object):
             if self.mode == 1:
                 frame = self._apply_masking(frame, unknown_faces_locs, self.sign)
 
-            frame_flip = cv2.flip(frame, 1)  # 좌우반전 flip
+            frame_flip = cv2.flip(frame, 1)
             _, jpeg = cv2.imencode('.jpg', frame_flip)  # jpeg:인코딩 된 이미지
 
             self.processed_frame = jpeg.tobytes()
