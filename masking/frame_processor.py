@@ -19,6 +19,9 @@ class FrameProcessor(object):
         self.weights = self.face_detector + 'res10_300x300_ssd_iter_140000.caffemodel'
         self.net = cv2.dnn.readNet(self.prototxt, self.weights)
 
+        self.reg_model = load_model(self.model_path)
+        self.reg_net = cv2.dnn.readNet(self.prototxt, self.weights)
+
         self.margin = 10
         self.batch_size = 1
         self.n_img_per_person = 30
@@ -37,13 +40,14 @@ class FrameProcessor(object):
         self.mode = 1
         self.sign = 1
 
-        self.grabbed, self.frame = None, None
-        #self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
-        self.video = cv2.VideoCapture(0)
-        #threading.Thread(target=self.update, args=()).start()
+        #self.grabbed, self.frame = None, None
+        self.video = cv2.VideoCapture('rtmp://52.79.67.16:1935/live/test')
+#        self.video = cv2.VideoCapture(0)
+        (self.grabbed, self.frame) = self.video.read()
+        threading.Thread(target=self.update, args=()).start()
 
-        self.processed_frame = None
-        threading.Thread(target=self.get_frame_loop, args=()).start()
+        #self.processed_frame = None
+        #threading.Thread(target=self.get_frame_loop, args=()).start()
 
     def __del__(self):
         self.video.release()
@@ -71,17 +75,17 @@ class FrameProcessor(object):
         output = x / np.sqrt(np.maximum(np.sum(np.square(x), axis=axis, keepdims=True), epsilon))
         return output
 
-    def calc_embs(self, imgs, batch_size):
+    def calc_embs(self, model, imgs, batch_size):
         aligned_images = self.prewhiten(imgs)
         pd = []
         for start in range(0, len(aligned_images), batch_size):
-            pd.append(self.model.predict_on_batch(aligned_images[start:start + batch_size]))
+            pd.append(model.predict_on_batch(aligned_images[start:start + batch_size]))
         embs = self.l2_normalize(np.concatenate(pd))
 
         return embs
 
     def capture_images(self, frame, name='Unknown'):
-        detected_faces_locs = self._detect_faces(frame)
+        detected_faces_locs = self._detect_faces(self.reg_net, frame)
         #print(detected_faces_locs)
 
         if detected_faces_locs == []:
@@ -116,7 +120,7 @@ class FrameProcessor(object):
         names = self.data.keys()
         print("Preparing training datas...")
         for name, imgs in self.data.items():
-            embs_ = self.calc_embs(imgs, self.batch_size)
+            embs_ = self.calc_embs(self.reg_model, imgs, self.batch_size)
             labels.extend([name] * len(embs_))
             embs.append(embs_)
 
@@ -202,10 +206,10 @@ class FrameProcessor(object):
         elif sign == 3:
             return self._do_imaging(frame, unknown_imgs_locs)
 
-    def _detect_faces(self, frame):
+    def _detect_faces(self, net, frame):
         blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), (104.0, 177.0, 123.0))
-        self.net.setInput(blob)  # setInput() : blob 이미지를 네트워크의 입력으로 설정
-        detections = self.net.forward()  # forward() : 네트워크 실행(얼굴 인식)
+        net.setInput(blob)  # setInput() : blob 이미지를 네트워크의 입력으로 설정
+        detections = net.forward()  # forward() : 네트워크 실행(얼굴 인식)
 
         detected_faces_locs = []
 
@@ -235,9 +239,9 @@ class FrameProcessor(object):
             (left, top, right, bottom) = locs
 
             img = resize(frame[top:bottom, left:right, :], (160, 160), mode='reflect')  # 학습용 이미지로 전처리
-            embs = self.calc_embs(img[np.newaxis], 1)
+            embs = self.calc_embs(self.model, img[np.newaxis], 1)
 
-            threshold = 0.8
+            threshold = 0.6
             # pred = "Unknown"
             for i in range(0, np.shape(self.mean_embs)[0]):
                 # dst = DeepFace.dst.findEuclideanDistance(self.mean_embs[i], embs)
@@ -255,7 +259,7 @@ class FrameProcessor(object):
             (left, top, right, bottom) = locs
 
             img = resize(frame[top:bottom, left:right, :], (160, 160), mode='reflect')  # 학습용 이미지로 전처리
-            embs = self.calc_embs(img[np.newaxis], 1)
+            embs = self.calc_embs(self.model, img[np.newaxis], 1)
 
             for mean_embs in cpy_mean_embs: #등록된 얼굴 수만큼 반복
                 #print(mean_embs)
@@ -271,7 +275,7 @@ class FrameProcessor(object):
         frame = self.frame  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
         (self.H, self.W) = frame.shape[:2]
 
-        detected_faces_locs = self._detect_faces(frame)
+        detected_faces_locs = self._detect_faces(self.net, frame)
         unknown_faces_locs = self._optimized_recognize_faces(frame, detected_faces_locs)
 
         if self.mode == 1:
@@ -289,7 +293,7 @@ class FrameProcessor(object):
             frame = self.frame.copy()  # self.frame을 새 변수에 저장하지 않고 뒤에서 self.frame을 이용해서 코딩하면 성능 엄청 떨어짐. why?
             (self.H, self.W) = frame.shape[:2]
 
-            detected_faces_locs = self._detect_faces(frame)
+            detected_faces_locs = self._detect_faces(self.net, frame)
             unknown_faces_locs = self._optimized_recognize_faces(frame, detected_faces_locs)
 
             if self.mode == 1:
@@ -305,7 +309,7 @@ class FrameProcessor(object):
         frame = self.frame.copy()
         (self.H, self.W) = frame.shape[:2]
 
-        detected_faces_locs = self._detect_faces(frame)
+        detected_faces_locs = self._detect_faces(self.reg_net, frame)
         frame_for_registration = self.capture_images(frame, detected_faces_locs)
 
         frame_flip = cv2.flip(frame_for_registration, 1)
