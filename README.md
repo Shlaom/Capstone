@@ -16,13 +16,21 @@
 
 ## 필요 기술 및 참고 문헌
 [1] FaceNet, “https://github.com/davidsandberg/facenet”.
+
 [2] FaceNet, “https://arxiv.org/abs/1503.03832”.
+
 [3] OpenCV, “https://docs.opencv.org/4.6.0/index.html”.
+
 [4] django, “https://docs.djangoproject.com/en/4.1/”.   
+
 [5] SSD, “https://arxiv.org/abs/1512.02325”.
+
 [6] Keras, “https://keras.io/guides/”.
+
 [7] Python, “https://docs.python.org/ko/3.6/tutorial/index.html”.
+
 [8] nginx, "https://docs.nginx.com/".
+
 [9] nginx, "https://github.com/arut/nginx-rtmp-module".
 
 ## 팀원 구성
