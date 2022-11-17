@@ -15,17 +15,15 @@
 ![image](https://user-images.githubusercontent.com/96522336/201468231-42ff76ae-da99-4418-b985-a603dfc7549a.png)
 
 ## 필요 기술 및 참고 문헌
-FaceNet
-+ A Unified Embedding for Face Recognition and Clustering
-+ https://github.com/davidsandberg/facenet
-+ https://arxiv.org/abs/1503.03832
-
-OpenCV
-+ https://opencv.org
-
-RTMP(Real Time Messaging Protocol)
-
-기타 인공지능, 네트워크, 코틀린, Django, DB서적
+[1] FaceNet, “https://github.com/davidsandberg/facenet”.
+[2] FaceNet, “https://arxiv.org/abs/1503.03832”.
+[3] OpenCV, “https://docs.opencv.org/4.6.0/index.html”.
+[4] django, “https://docs.djangoproject.com/en/4.1/”.   
+[5] SSD, “https://arxiv.org/abs/1512.02325”.
+[6] Keras, “https://keras.io/guides/”.
+[7] Python, “https://docs.python.org/ko/3.6/tutorial/index.html”.
+[8] nginx, "https://docs.nginx.com/".
+[9] nginx, "https://github.com/arut/nginx-rtmp-module".
 
 ## 팀원 구성
 이승준 https://github.com/Shlaom
