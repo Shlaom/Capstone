@@ -285,12 +285,10 @@ class FrameProcessor(object):
             self.processed_frame = jpeg.tobytes()
 
     def get_frame_for_registration(self):
-        #_, frame = self.video.read()
         frame = self.frame.copy()
         (self.H, self.W) = frame.shape[:2]
 
-        detected_faces_locs = self._detect_faces(self.reg_net, frame)
-        frame_for_registration = self.capture_images(frame, detected_faces_locs)
+        frame_for_registration = self.capture_images(frame)
 
         frame_flip = cv2.flip(frame_for_registration, 1)
         _, jpeg = cv2.imencode('.jpg', frame_flip)
